@@ -1,12 +1,11 @@
-# Monkey Jump
->Simple Infinite scrolling game using phaser 3
+# Mots Outils
+>Serious Game for French learning in Phaser 3
 
 This is a Typpescript game build with Phaser 3 and the Typescript + Vite.js template.
 
-The game structure is composed of a home screen with a simple audio toggle button, and a play button leadong to the main scene.
-In the main scene, platforms are randomly created from right to left and the player jumps across them collecting items (bananas) and avoiding enemies (parrots and statues)
+This game is a simple letter matching game to learn french "tool words" ("mots outils" in french) you have to learn in 1st grade in french schools.
 
-The game is live at https://japansio.info/monkey
+The game is live at https://japansio.info/motsoutils
 
 Below is the original readme of the template.
 
