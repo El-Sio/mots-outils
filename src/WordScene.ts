@@ -26,6 +26,8 @@ export default class WordScene extends Phaser.Scene {
     homeButton!:Phaser.Physics.Arcade.Sprite
     muteButton!:Phaser.Physics.Arcade.Sprite
 
+    livesTile!:Phaser.Physics.Arcade.Sprite
+
     right!:Phaser.Sound.BaseSound
     wrong!:Phaser.Sound.BaseSound
     applause!:Phaser.Sound.BaseSound
@@ -37,7 +39,9 @@ export default class WordScene extends Phaser.Scene {
     currentIndex = 0
     hint = ''
     completion = 0
-
+    lives = 5
+    
+    livesText:any
     completiontext:any
     hintText:any
 
@@ -116,6 +120,12 @@ preload() {
     this.load.image('Y', 'img/Y.png')
     this.load.image('Z', 'img/Z.png')
 
+    this.load.image('1', 'img/1.png')
+    this.load.image('2', 'img/2.png')
+    this.load.image('3', 'img/3.png')
+    this.load.image('4', 'img/4.png')
+    this.load.image('5', 'img/5.png')
+
     this.load.image('apo', 'img/apo.png')
     this.load.image('blank', 'img/blank.png')
     this.load.image('tilebg', 'img/greentile.png')
@@ -135,6 +145,7 @@ create() {
     this.previouswords = []
     this.currentIndex = 0
     this.completion = 0
+    this.lives = 5
 
     this.hint = ''
     this.completiontext = ''
@@ -188,6 +199,10 @@ create() {
     })
 
     this.tiles = this.physics.add.group()
+
+
+    this.livesTile = this.physics.add.sprite(this.canvas.width - this.tileWidth, 2*this.tileHeight,this.lives.toString()).setDepth(2)
+    this.livesText = this.add.text(this.canvas.width - 3.5*this.tileWidth, 2* this.tileHeight,'Essai(s) restant :', {font: '30px Arial', align:'center', color: "#fff"}).setOrigin(0.5)
 
     this.nextButton = this.physics.add.sprite(this.canvas.width/2, this.canvas.height - this.tileHeight, 'buttons')
     this.nextButton.setOrigin(0.5).setDepth(2).setScale(0.1).setInteractive().anims.play('play').on('pointerdown', (_event:any, _gameObjects:any) =>
@@ -261,6 +276,10 @@ startGame() {
     this.previouswords = []
     this.completion = 0
     this.currentIndex = 0
+    this.lives = 5
+    this.isGameOver = false
+    this.livesTile.setTexture(this.lives.toString())
+    this.livesTile.setVisible(true)
     this.quitButton.visible = false
     this.nextButton.visible = false
     this.retryButton.visible = false
@@ -308,6 +327,8 @@ quitGame() {
     this.quitButton.visible = false
     this.nextButton.visible = false
     this.retryButton.visible = false
+    this.isGameOver = false
+    this.livesTile.setVisible(true)
 
     this.completiontext.setText('Mots réussis : 0 / '+this.dictionary.length)
     this.hintText.setText('')
@@ -340,6 +361,14 @@ clickTile(_pinter:any, go:any) {
 
         this.wrong.play()
         this.cameras.main.shake(300,0.1)
+        this.lives -=1
+        if(this.lives>=1) {
+            this.livesTile.setTexture(this.lives.toString())
+        } else {
+            //game over
+            this.isGameOver = true
+            this.nextWord('PERDU')
+        }
     }
 
 }
@@ -454,17 +483,25 @@ nextWord(word:string) {
     this.nextButton.visible = false
 
     if(this.completion < this.dictionary.length) {
-        this.tiles.clear(true)
-        this.chooseword()
+        if(!this.isGameOver) {
+            this.tiles.clear(true)
+            this.chooseword()
+        } else {
+            this.tiles.clear(true)
+            this.hintText.setText('tu as réussi ' + this.completion + ' mots sur ' + this.dictionary.length.toString())
+            this.drawWord('TERMINÉ', this.canvas.width/2 - 3.5*this.tileWidth - 3*this.spacer, this.canvas.height/2)
+            this.retryButton.visible = true
+            this.quitButton.visible = true
+            this.livesTile.setVisible(false)
+        }
     } else {
-        this.tiles.clear(true)
-        this.hintText.setText('')
-        this.drawWord('BRAVO', this.canvas.width/2 - 2.5*this.tileWidth - 2*this.spacer, this.canvas.height/2)
-        this.applause.play()
-        this.retryButton.visible = true
-        this.quitButton.visible = true
+            this.tiles.clear(true)
+            this.hintText.setText('')
+            this.drawWord('BRAVO', this.canvas.width/2 - 2.5*this.tileWidth - 2*this.spacer, this.canvas.height/2)
+            this.applause.play()
+            this.retryButton.visible = true
+            this.quitButton.visible = true
+        }
     }
-
-}
 
 }
