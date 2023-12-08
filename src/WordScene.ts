@@ -72,12 +72,12 @@ export default class WordScene extends Phaser.Scene {
         {value:"DE", examples:["Taoki mange __ la viande", "Hugo n'a pas __ chance"]},
         {value:"LE", examples:["Taoki prends __ train", "Lili prépare __ gouter"]},
         {value:"IL", examples:["Zut, __ pleut, dit Taoki", "Comme __ est beau ce ballon"]},
-        {value:"TRES", examples:["Taoki est ____ fatigué", "La banane est ____ bonne"]},
+        {value:"TRÈS", examples:["Taoki est ____ fatigué", "La banane est ____ bonne"]},
         {value:"QUI", examples:["___ est là ? demande Taoki", "C'est le bus ___ roule dans la rue"]},
         {value:"S'EST", examples:["Hugo _____ fait mal", "Lili _____ trompée"]},
         {value:"AU", examples:["Taoki et Hugo vont __ cinéma", "Taoki est fatigué, il va __ lit"]},
-        {value:"MEME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"]},
-        {value:"OU", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"]},
+        {value:"MÊME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"]},
+        {value:"OÙ", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"]},
         
     ]
 
@@ -90,6 +90,9 @@ preload() {
     this.load.image('C', 'img/C.png')
     this.load.image('D', 'img/D.png')
     this.load.image('E', 'img/E.png')
+    this.load.image('É', 'img/É.png')
+    this.load.image('È', 'img/È.png')
+    this.load.image('Ê', 'img/Ê.png')
     this.load.image('F', 'img/F.png')
     this.load.image('G', 'img/G.png')
     this.load.image('H', 'img/H.png')
@@ -106,6 +109,7 @@ preload() {
     this.load.image('S', 'img/S.png')
     this.load.image('T', 'img/T.png')
     this.load.image('U', 'img/U.png')
+    this.load.image('Ù', 'img/Ù.png')
     this.load.image('V', 'img/V.png')
     this.load.image('W', 'img/W.png')
     this.load.image('X', 'img/X.png')
@@ -393,7 +397,7 @@ drawTiles(word:string, startX:number, startY:number) {
 }
 
 completeString(input: string, length: number): string {
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // Define the character pool
+    const alphabet = 'ABCDEÉÈÊFGHIJKLMNOPQRSTUÙVWXYZ'; // Define the character pool
     let result = input;
   
     if (length <= input.length) {
