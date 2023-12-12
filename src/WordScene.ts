@@ -10,9 +10,14 @@ export default class WordScene extends Phaser.Scene {
 		super('playGame')
     }
 
+    useLives!:boolean
+    useTimer!:boolean
+
     tileWidth = 0
     tileHeight = 0
 
+    initialtime = 30
+    ticker = 0
     spacer = 0
 
     canvas:any
@@ -39,14 +44,23 @@ export default class WordScene extends Phaser.Scene {
     currentIndex = 0
     hint = ''
     completion = 0
+    missedWords = 0
     lives = 5
     
+    TIMELIMIT = 30
+
     livesText:any
     completiontext:any
     hintText:any
+    timerText:any
+
+    roundclock:any
+
+    timedEvent:any
 
     paused = false
     isGameOver = false
+    pauseTimer = false
 
     dictionary: toolWord[] = [
         {value:'DANS', examples:['Taoki est ____ le bus', 'Le bol est ____ le placard']},
@@ -82,8 +96,16 @@ export default class WordScene extends Phaser.Scene {
         {value:"AU", examples:["Taoki et Hugo vont __ cinéma", "Taoki est fatigué, il va __ lit"]},
         {value:"MÊME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"]},
         {value:"OÙ", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"]},
+        {value:"QUELLE", examples:["______ bonne idée !", "______ fête magnifique !"]},
         
     ]
+
+init(data:any) {
+
+    //get option values from UI scene
+    this.useLives = data.lives
+    this.useTimer = data.timer
+}
 
 preload() {
 
@@ -147,6 +169,9 @@ create() {
     this.completion = 0
     this.lives = 5
 
+    this.initialtime = this.TIMELIMIT
+    this.ticker = 0
+
     this.hint = ''
     this.completiontext = ''
 
@@ -201,8 +226,18 @@ create() {
     this.tiles = this.physics.add.group()
 
 
-    this.livesTile = this.physics.add.sprite(this.canvas.width - this.tileWidth, 2*this.tileHeight,this.lives.toString()).setDepth(2)
-    this.livesText = this.add.text(this.canvas.width - 3.5*this.tileWidth, 2* this.tileHeight,'Essai(s) restant :', {font: '30px Arial', align:'center', color: "#fff"}).setOrigin(0.5)
+    if(this.useLives) {
+        this.livesTile = this.physics.add.sprite(this.canvas.width - this.tileWidth, 2*this.tileHeight,this.lives.toString()).setDepth(2)
+        this.livesText = this.add.text(this.canvas.width - 3.5*this.tileWidth, 2* this.tileHeight,'Essai(s) restant :', {font: '30px Arial', align:'center', color: "#fff"}).setOrigin(0.5)
+    }
+
+    if(this.useTimer) {
+        this.timerText = this.add.text(this.canvas.width - 3*this.tileWidth, 5*this.tileHeight,this.formatTime(this.initialtime), {font: '30px Arial', align:'center', color: "#fff"}).setOrigin(0.5)
+        this.roundclock = this.add.graphics().setDepth(3)
+        this.add.sprite(this.canvas.width - 3*this.tileWidth, 4*this.tileHeight, 'blank').setOrigin(0.5).setDepth(2)
+    }
+
+    this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onTick, callbackScope: this, loop: true });
 
     this.nextButton = this.physics.add.sprite(this.canvas.width/2, this.canvas.height - this.tileHeight, 'buttons')
     this.nextButton.setOrigin(0.5).setDepth(2).setScale(0.1).setInteractive().anims.play('play').on('pointerdown', (_event:any, _gameObjects:any) =>
@@ -259,6 +294,25 @@ update(_time:number, _delta:number) {
 
 }
 
+onTick() {
+    if(this.useTimer && !this.pauseTimer){
+        this.initialtime -=1
+        this.ticker +=1
+        this.timerText.setText(this.formatTime(this.initialtime))
+
+        this.roundclock.clear()
+        this.roundclock.slice(this.canvas.width - 3*this.tileWidth, 4*this.tileHeight, 0.9*(this.tileWidth/2), Phaser.Math.DegToRad(270), Phaser.Math.DegToRad(270 - 12*this.ticker), false);
+        this.roundclock.fillStyle(0x000000, 0.8);
+        this.roundclock.fillPath();
+
+        if(this.initialtime <= 0) {
+            this.wrong.play()
+            this.missedWords +=1
+            this.nextWord(this.chosenWord)
+        }
+    }
+}
+
 toggleMute() {
     if (!this.game.sound.mute) {
         this.game.sound.mute = true;
@@ -275,11 +329,18 @@ startGame() {
     this.chosenWord = ''
     this.previouswords = []
     this.completion = 0
+    this.missedWords = 0
     this.currentIndex = 0
-    this.lives = 5
     this.isGameOver = false
-    this.livesTile.setTexture(this.lives.toString())
-    this.livesTile.setVisible(true)
+    this.initialtime = this.TIMELIMIT
+    this.ticker = 0
+    this.pauseTimer = false
+
+    if(this.useLives) {
+        this.lives = 5
+        this.livesTile.setTexture(this.lives.toString())
+        this.livesTile.setVisible(true)
+    }
     this.quitButton.visible = false
     this.nextButton.visible = false
     this.retryButton.visible = false
@@ -316,6 +377,17 @@ resizeApp ()
     canvas.style.height	= height + 'px';
 }
 
+formatTime(seconds:number){
+    // Minutes
+    var minutes = Math.floor(seconds/60);
+    // Seconds
+    var partInSeconds = seconds%60;
+    // Adds left zeros to seconds
+    var partInSecondstxt = partInSeconds.toString().padStart(2,'0');
+    // Returns formated time
+    return minutes + ':' + partInSecondstxt
+}
+
 //go back to main menu after game over
 quitGame() {
 
@@ -328,7 +400,10 @@ quitGame() {
     this.nextButton.visible = false
     this.retryButton.visible = false
     this.isGameOver = false
-    this.livesTile.setVisible(true)
+
+    if(this.useLives) {
+        this.livesTile.setVisible(true)
+    }
 
     this.completiontext.setText('Mots réussis : 0 / '+this.dictionary.length)
     this.hintText.setText('')
@@ -347,28 +422,34 @@ clickTile(_pinter:any, go:any) {
         var gl = this.physics.add.sprite((this.canvas.width/2 - this.chosenWord.length*this.tileWidth/2 - (this.chosenWord.length-1)*this.spacer/2) + (this.currentIndex-1)*(this.tileWidth+this.spacer),this.canvas.height/2 + this.tileHeight,go.texture.key).setDepth(2)
         this.tiles.add(gl)
         go.setTexture('blank')
-        go.disableInteractive()
+        go.removeInteractive()
         go.visible = false
 
         if(this.currentIndex == this.chosenletters.length) {
             this.complete.play()
             this.completion +=1
             this.completiontext.setText('mots réussis : ' + this.completion+ '/' + this.dictionary.length,)
+            this.tiles.children.iterate(t => {t.removeInteractive()})
+            this.pauseTimer = true
             this.nextButton.visible = true
+
         }
 
     } else {
 
         this.wrong.play()
         this.cameras.main.shake(300,0.1)
-        this.lives -=1
-        if(this.lives>=1) {
-            this.livesTile.setTexture(this.lives.toString())
-        } else {
-            //game over
-            this.isGameOver = true
-            this.nextWord('PERDU')
-        }
+
+        if(this.useLives) {
+            this.lives -=1
+            if(this.lives>=1) {
+                this.livesTile.setTexture(this.lives.toString())
+            } else {
+                //game over
+                this.isGameOver = true
+                this.nextWord('PERDU')
+            }
+    }
     }
 
 }
@@ -479,29 +560,48 @@ nextWord(word:string) {
 
     this.previouswords.push(word)
     this.currentIndex = 0
+
+    this.initialtime = this.TIMELIMIT
+    this.ticker = 0
+    this.pauseTimer = false
     
     this.nextButton.visible = false
 
-    if(this.completion < this.dictionary.length) {
+    if(this.completion + this.missedWords < this.dictionary.length) {
         if(!this.isGameOver) {
             this.tiles.clear(true)
             this.chooseword()
         } else {
+            this.pauseTimer = true
             this.tiles.clear(true)
             this.hintText.setText('tu as réussi ' + this.completion + ' mots sur ' + this.dictionary.length.toString())
             this.drawWord('TERMINÉ', this.canvas.width/2 - 3.5*this.tileWidth - 3*this.spacer, this.canvas.height/2)
+            this.tiles.children.iterate(t => {t.removeInteractive()})
             this.retryButton.visible = true
             this.quitButton.visible = true
             this.livesTile.setVisible(false)
         }
     } else {
+        if(this.missedWords == 0) {
+            this.pauseTimer = true
             this.tiles.clear(true)
             this.hintText.setText('')
             this.drawWord('BRAVO', this.canvas.width/2 - 2.5*this.tileWidth - 2*this.spacer, this.canvas.height/2)
+            this.tiles.children.iterate(t => {t.removeInteractive()})
             this.applause.play()
             this.retryButton.visible = true
             this.quitButton.visible = true
+        } else {
+            this.pauseTimer = true
+            this.tiles.clear(true)
+            this.hintText.setText('tu as réussi ' + this.completion + ' mots sur ' + this.dictionary.length.toString())
+            this.drawWord('TERMINÉ', this.canvas.width/2 - 3.5*this.tileWidth - 3*this.spacer, this.canvas.height/2)
+            this.tiles.children.iterate(t => {t.removeInteractive()})
+            this.retryButton.visible = true
+            this.quitButton.visible = true
+            this.livesTile.setVisible(false)
         }
+    }
     }
 
 }

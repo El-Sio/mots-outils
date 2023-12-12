@@ -9,9 +9,18 @@ export default class UIScene extends Phaser.Scene
 
     playButton!:Phaser.Physics.Arcade.Sprite
     muteButton!:Phaser.Physics.Arcade.Sprite
+    livesOption!:Phaser.Physics.Arcade.Sprite
+    timerOption!:Phaser.Physics.Arcade.Sprite
+    timerOptionText!:any
+    livesOptionText!:any
+    playText!:any
+
     tileWidth = 0
     tileHeight = 0
     spacer = 0
+
+    useLives = true
+    useTimer = true
 
     canvas:any
 
@@ -48,6 +57,8 @@ export default class UIScene extends Phaser.Scene
 
         this.load.image('blank', 'img/blank.png')
         this.load.image('tilebg', 'img/greentile.png')
+
+        this.load.image('checked', 'img/checked.png')
         
     }
 	create() {
@@ -76,10 +87,60 @@ export default class UIScene extends Phaser.Scene
     })
 
 
-    this.playButton = this.physics.add.sprite(this.canvas.width/2 - 2*this.tileWidth, this.canvas.height/2 + 4*this.tileHeight,'buttons').setScale(0.1).setDepth(3).setInteractive()
+    this.livesOptionText = this.add.text(this.canvas.width/2 - 4*this.tileWidth, this.canvas.height/2 + 3*this.tileHeight, "Limiter le nombre d'essais: ", {font: '25px Arial', align:'center', color: "#fff"}).setOrigin(0.5).setDepth(3)
+    this.livesOption = this.physics.add.sprite(this.canvas.width/2 - (this.tileWidth*5.5 + this.spacer*5), this.canvas.height/2 + 3*this.tileHeight, 'blank').setOrigin(0.5).setDepth(3).setInteractive()
+
+    if(this.useLives) {
+        this.livesOption.setTexture('checked')
+        this.livesOptionText.setText("Limiter le nombre d'essais: OUI")
+    } else {
+        this.livesOption.setTexture('blank')
+        this.livesOptionText.setText("Limiter le nombre d'essais: NON")
+    }
+
+    this.livesOption.on('pointerdown', (_event:any, _gameObjects:any) =>
+    {
+        if(this.livesOption.texture.key == 'blank') {
+           this.livesOption.setTexture('checked')
+           this.useLives = true
+           this.livesOptionText.setText( "Limiter le nombre d'essais : OUI")
+        } else if(this.livesOption.texture.key == 'checked') {
+            this.livesOption.setTexture('blank')
+            this.useLives = false
+            this.livesOptionText.setText( "Limiter le nombre d'essais : NON")
+        }
+    });
+
+    this.timerOptionText = this.add.text(this.canvas.width/2 - 4*this.tileWidth, this.canvas.height/2 + 5*this.tileHeight, "Limiter le temps par mot : NON", {font: '25px Arial', align:'center', color: "#fff"}).setOrigin(0.5).setDepth(3)
+    this.timerOption = this.physics.add.sprite(this.canvas.width/2 - (this.tileWidth*5.5 + this.spacer*5), this.canvas.height/2 + 5*this.tileHeight, 'blank').setOrigin(0.5).setDepth(3).setInteractive()
+
+    if(this.useTimer) {
+        this.timerOption.setTexture('checked')
+        this.timerOptionText.setText("Limiter le temps par mot : OUI")
+    } else {
+        this.timerOption.setTexture('blank')
+        this.timerOptionText.setText("Limiter le temps par mot : NON")
+    }
+
+    this.timerOption.on('pointerdown', (_event:any, _gameObjects:any) =>
+    {
+        if(this.timerOption.texture.key == 'blank') {
+           this.timerOption.setTexture('checked')
+           this.useTimer = true
+           this.timerOptionText.setText("Limiter le temps par mot : OUI")
+        } else if(this.timerOption.texture.key == 'checked') {
+            this.timerOption.setTexture('blank')
+            this.useTimer = false
+            this.timerOptionText.setText("Limiter le temps par mot : NON")
+        }
+    });
+
+
+    this.playText = this.add.text(this.canvas.width/2 + 6*this.tileWidth, this.canvas.height/2 + 4*this.tileHeight,'Jouer',{font: '50px Arial', align:'center', color: "#fff"}).setOrigin(0.5).setDepth(3)
+    this.playButton = this.physics.add.sprite(this.canvas.width/2 + 4*this.tileWidth, this.canvas.height/2 + 4*this.tileHeight,'buttons').setScale(0.1).setDepth(3).setInteractive()
     this.playButton.anims.play('play')
 
-    this.muteButton = this.physics.add.sprite(this.canvas.width/2 + 2*this.tileWidth, this.canvas.height/2 + 4*this.tileHeight,'buttons').setScale(0.1).setDepth(3).setInteractive()
+    this.muteButton = this.physics.add.sprite(4*this.tileWidth, 2*this.tileHeight,'buttons').setScale(0.1).setDepth(3).setInteractive()
     this.muteButton.anims.play('mute')
 
         this.playButton.on('pointerdown', (_event:any, _gameObjects:any) =>
@@ -95,9 +156,9 @@ export default class UIScene extends Phaser.Scene
 
     this.cameras.main.fadeIn(2000)
 
-    this.drawWord('LE JEU', this.canvas.width/2 - (this.tileWidth*3 + this.spacer*2.5), this.canvas.height/2 - 2*this.tileHeight)
-    this.drawWord('DES', this.canvas.width/2 - (this.tileWidth*1.5 + this.spacer), this.canvas.height/2)
-    this.drawWord('MOTS OUTILS', this.canvas.width/2 - (this.tileWidth*5.5 + this.spacer*5), this.canvas.height/2 + 2*this.tileHeight)
+    this.drawWord('LE JEU', this.canvas.width/2 - (this.tileWidth*3 + this.spacer*2.5), this.canvas.height/2 - 4*this.tileHeight)
+    this.drawWord('DES', this.canvas.width/2 - (this.tileWidth*1.5 + this.spacer), this.canvas.height/2 - 2*this.tileHeight)
+    this.drawWord('MOTS OUTILS', this.canvas.width/2 - (this.tileWidth*5.5 + this.spacer*5), this.canvas.height/2)
 
     }
 
@@ -139,8 +200,8 @@ export default class UIScene extends Phaser.Scene
 startGame() {
     //go to next scene...
     this.cameras.main.fadeOut(2000)
+    this.sys.game.scene.start('playGame', {lives:this.useLives,timer:this.useTimer})
     this.scene.stop()
-    this.sys.game.scene.start('playGame')
 }
 
 toggleMute() {
