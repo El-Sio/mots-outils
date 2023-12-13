@@ -2,7 +2,8 @@ import Phaser from 'phaser'
 
 export interface toolWord {
     value:string,
-    examples:string[]
+    examples:string[],
+    exampleaudio:string[]
 }
 
 export default class WordScene extends Phaser.Scene {
@@ -30,6 +31,7 @@ export default class WordScene extends Phaser.Scene {
     retryButton!:Phaser.Physics.Arcade.Sprite
     homeButton!:Phaser.Physics.Arcade.Sprite
     muteButton!:Phaser.Physics.Arcade.Sprite
+    hintPlayButton!:Phaser.Physics.Arcade.Sprite
 
     livesTile!:Phaser.Physics.Arcade.Sprite
 
@@ -37,12 +39,15 @@ export default class WordScene extends Phaser.Scene {
     wrong!:Phaser.Sound.BaseSound
     applause!:Phaser.Sound.BaseSound
     complete!:Phaser.Sound.BaseSound
+    hintaudio!:Phaser.Sound.BaseSound
     
     chosenWord = ''
+    audiohintURL = ''
     previouswords: string[] = []
     chosenletters: any[] = []
     currentIndex = 0
     hint = ''
+    audiohinttext = ''
     completion = 0
     missedWords = 0
     lives = 5
@@ -63,40 +68,40 @@ export default class WordScene extends Phaser.Scene {
     pauseTimer = false
 
     dictionary: toolWord[] = [
-        {value:'DANS', examples:['Taoki est ____ le bus', 'Le bol est ____ le placard']},
-        {value:'EST', examples:['Taoki ___ malade', 'Hugo ___ ravi']},
-        {value:'AUSSI', examples:['Hugo est ravi et lili _____ ', 'Lili a un cahier et _____ un crayon']},
-        {value:'SANS', examples:['Taoki fait du vélo ____ les mains', 'Hugo est venu ____ pantalon']},
-        {value:'ET', examples:['Taoki __ Lili', 'Hugo __ Taoki']},
-        {value:'SONT', examples:['Taoki et Hugo ____ dans la maison', 'Hugo et Lili ____ contents']},
-        {value:'AVEC', examples:['Taoki fait un gateau ____ Lili', 'Hugo va au parc ____ Taoki']},
-        {value:'MAIS', examples:['Taoki aime les bananes ____ pas les pommes', 'Hugo est fatigué ____ heureux']},
-        {value:'DES', examples:['Taoki a ___ amis', 'Hugo et Lili sont ___ enfants']},
-        {value:'LES', examples:['Taoki joue avec ___ enfants', 'Hugo regarde ___ nuages']},
-        {value:'COMME', examples:['Taoki fait du vélo _____ un grand', 'Lili veut faire _____ maman']},
-        {value:'CHEZ', examples:['Taoki va ____ le docteur', 'Hugo et Lili sont ____ leur mamie']},
-        {value:'CAR', examples:['Taoki va chez le docteur ___ il a mal au dos', 'Hugo est ravi ___ il mange une glace']},
-        {value:'SES', examples:['Taoki range ___ crayons dans sa trousse', 'Lili joue avec ___ jouets']},
-        {value:'EN', examples:['Taoki va chez le docteur __ vélo', 'Hugo et Lili sont __ vacances']},
-        {value:'SON', examples:['Taoki joue avec ___ chien', 'Hugo aime ___ papa']},
-        {value:'SUR', examples:['Le livre est ___ la table', 'Hugo et Lili sont ___ un bateau']},
-        {value:'NE PAS', examples:['Taoki __ mange ___ de légumes', 'Hugo et Lili __ vont ___ à la cantine le lundi']},
-        {value:'IL Y A', examples:['Ce soir, __ _ _ du dessert', 'Dans la jungle __ _ _ des lions']},
-        {value:"C'EST", examples:["_____ Taoki qui a gagné", "_____ le ballon de Hugo"]},
-        {value:"UNE", examples:["Taoki mange ___ pomme", "Lili joue avec ___ balle"]},
-        {value:"ELLE", examples:["____ est belle maman", "Maintenant c'est ____ qui est le chat, dit hugo"]},
-        {value:"UN", examples:["Taoki est __dragon", "Hugo a __ vélo"]},
-        {value:"LA", examples:["Taoki mange __ pomme", "__ banane est bonne"]},
-        {value:"DE", examples:["Taoki mange __ la viande", "Hugo n'a pas __ chance"]},
-        {value:"LE", examples:["Taoki prends __ train", "Lili prépare __ gouter"]},
-        {value:"IL", examples:["Zut, __ pleut, dit Taoki", "Comme __ est beau ce ballon"]},
-        {value:"TRÈS", examples:["Taoki est ____ fatigué", "La banane est ____ bonne"]},
-        {value:"QUI", examples:["___ est là ? demande Taoki", "C'est le bus ___ roule dans la rue"]},
-        {value:"S'EST", examples:["Hugo _____ fait mal", "Lili _____ trompée"]},
-        {value:"AU", examples:["Taoki et Hugo vont __ cinéma", "Taoki est fatigué, il va __ lit"]},
-        {value:"MÊME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"]},
-        {value:"OÙ", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"]},
-        {value:"QUELLE", examples:["______ bonne idée !", "______ fête magnifique !"]},
+        {value:'DANS', examples:['Taoki est ____ le bus', 'Le bol est ____ le placard'],exampleaudio:['DANS_1', 'DANS_2']},
+        {value:'EST', examples:['Taoki ___ malade', 'Hugo ___ ravi'],exampleaudio:['EST_1', 'EST_2']},
+        {value:'AUSSI', examples:['Hugo est ravi et lili _____ ', 'Lili a un cahier et _____ un crayon'],exampleaudio:['AUSSI_1', 'AUSSI_2']},
+        {value:'SANS', examples:['Taoki fait du vélo ____ les mains', 'Hugo est venu ____ pantalon'],exampleaudio:['SANS_1', 'SANS_2']},
+        {value:'ET', examples:['Taoki __ Lili sont amis', 'Hugo __ Taoki sont en vacances'],exampleaudio:['ET_1', 'ET_2']},
+        {value:'SONT', examples:['Taoki et Hugo ____ dans la maison', 'Hugo et Lili ____ contents'],exampleaudio:['SONT_1', 'SONT_2']},
+        {value:'AVEC', examples:['Taoki fait un gateau ____ Lili', 'Hugo va au parc ____ Taoki'],exampleaudio:['AVEC_1', 'AVEC_2']},
+        {value:'MAIS', examples:['Taoki aime les bananes ____ pas les pommes', 'Hugo est fatigué ____ heureux'],exampleaudio:['MAIS_1', 'MAIS_2']},
+        {value:'DES', examples:['Taoki a ___ amis', 'Hugo et Lili sont ___ enfants'],exampleaudio:['DES_1', 'DES_2']},
+        {value:'LES', examples:['Taoki joue avec ___ enfants', 'Hugo regarde ___ nuages'],exampleaudio:['LES_1', 'LES_2']},
+        {value:'COMME', examples:['Taoki fait du vélo _____ un grand', 'Lili veut faire _____ maman'],exampleaudio:['COMME_1', 'COMME_2']},
+        {value:'CHEZ', examples:['Taoki va ____ le docteur', 'Hugo et Lili sont ____ leur mamie'],exampleaudio:['CHEZ_1', 'CHEZ_2']},
+        {value:'CAR', examples:['Taoki va chez le docteur ___ il a mal au dos', 'Hugo est ravi ___ il mange une glace'],exampleaudio:['CAR_1', 'CAR_2']},
+        {value:'SES', examples:['Taoki range ___ crayons dans sa trousse', 'Lili joue avec ___ jouets'],exampleaudio:['SES_1', 'SES_2']},
+        {value:'EN', examples:['Taoki va chez le docteur __ vélo', 'Hugo et Lili sont __ vacances'],exampleaudio:['EN_1','EN_2']},
+        {value:'SON', examples:['Taoki joue avec ___ chien', 'Hugo aime ___ papa'],exampleaudio:['SON_1', 'SON_2']},
+        {value:'SUR', examples:['Le livre est ___ la table', 'Hugo et Lili sont ___ un bateau'],exampleaudio:['SUR_1','SUR_2']},
+        {value:'NE PAS', examples:['Taoki __ mange ___ de légumes', 'Hugo et Lili __ vont ___ à la cantine le lundi'],exampleaudio:['NE_PAS_1', 'NE_PAS_2']},
+        {value:'IL Y A', examples:['Ce soir, __ _ _ du dessert', 'Dans la jungle __ _ _ des lions'],exampleaudio:['IL_Y_A_1','IL_Y_A_2']},
+        {value:"C'EST", examples:["_____ Taoki qui a gagné", "_____ le ballon de Hugo"],exampleaudio:['C_EST_1','C_EST_2']},
+        {value:"UNE", examples:["Taoki mange ___ pomme", "Lili joue avec ___ balle"],exampleaudio:['UNE_1','UNE_2']},
+        {value:"ELLE", examples:["____ est belle maman, dit Lili.", "Maintenant c'est ____ qui est le chat, dit hugo"],exampleaudio:['ELLE_1','ELLE_2']},
+        {value:"UN", examples:["Taoki est __dragon", "Hugo a __ vélo"],exampleaudio:['UN_1','UN_2']},
+        {value:"LA", examples:["Taoki mange __ pomme", "__ banane est bonne"],exampleaudio:['LA_1','LA_2']},
+        {value:"DE", examples:["Taoki mange __ la viande", "Hugo n'a pas __ chance"],exampleaudio:['DE_1','DE_2']},
+        {value:"LE", examples:["Taoki prends __ train", "Lili prépare __ gouter"],exampleaudio:['LE_1','LE_2']},
+        {value:"IL", examples:["Zut, __ pleut, dit Taoki", "Comme __ est beau ce ballon, dit Hugo"],exampleaudio:['IL_1','IL_2']},
+        {value:"TRÈS", examples:["Taoki est ____ fatigué", "La banane est ____ bonne"],exampleaudio:['TRES_1','TRES_2']},
+        {value:"QUI", examples:["___ est là ? demande Taoki", "C'est le bus ___ roule dans la rue"],exampleaudio:['QUI_1','QUI_2']},
+        {value:"S'EST", examples:["Hugo _____ fait mal", "Lili _____ trompée"],exampleaudio:['S_EST_1','S_EST_2']},
+        {value:"AU", examples:["Taoki et Hugo vont __ cinéma", "Taoki est fatigué, il va __ lit"],exampleaudio:['AU_1','AU_2']},
+        {value:"MÊME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"],exampleaudio:['MEME_1','MEME_2']},
+        {value:"OÙ", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"],exampleaudio:['OU_1','OU_2']},
+        {value:"QUELLE", examples:["______ bonne idée !", "______ fête magnifique !"],exampleaudio:['QUELLE_1','QUELLE_2']},
         
     ]
 
@@ -173,6 +178,7 @@ create() {
     this.ticker = 0
 
     this.hint = ''
+    this.audiohinttext = ''
     this.completiontext = ''
 
     this.canvas = this.sys.canvas
@@ -188,8 +194,8 @@ create() {
 
     this.add.tileSprite(0,0, this.canvas.width*2, this.canvas.height*2, 'tilebg')
 
-    this.completiontext = this.add.text(this.canvas.width/2, 3*this.tileHeight, 'Mots réussis : 0 / '+this.dictionary.length,{font: '50px Arial', align:'center', color: "#fff"}).setDepth(2).setOrigin(0.5)
-    this.hintText = this.add.text(this.canvas.width/2, this.canvas.height/2 - this.tileHeight, this.hint, {font: '50px Arial', align:'center', color: "#fff"}).setDepth(2).setOrigin(0.5)
+    this.completiontext = this.add.text(this.canvas.width/2, 2*this.tileHeight, 'Mots réussis : 0 / '+this.dictionary.length,{font: '50px Arial', align:'center', color: "#fff"}).setDepth(2).setOrigin(0.5)
+    this.hintText = this.add.text(this.canvas.width/2, this.canvas.height/2 - 2*this.tileHeight, this.hint, {font: '50px Arial', align:'center', color: "#fff"}).setDepth(2).setOrigin(0.5)
 
     window.addEventListener('resize', this.resizeApp);
 
@@ -273,7 +279,15 @@ create() {
     this.muteButton.on('pointerdown', (_pointer:any) =>
     {
         this.toggleMute()
-    });
+    })
+
+    this.hintPlayButton = this.physics.add.sprite(this.canvas.width/2 ,this.canvas.height/2 - this.tileHeight, 'buttons').setScale(0.08).setOrigin(0.5).setDepth(3).setInteractive()
+    this.hintPlayButton.anims.play('play')
+    this.hintPlayButton.on('pointerdown', (_pointer:any) =>
+    {
+        this.hintaudio.play()
+    })
+    this.hintPlayButton.visible = false
 
     this.chooseword()
 
@@ -325,8 +339,11 @@ toggleMute() {
 
 startGame() {
 
+    //console.log('audio cache after game', this.cache.audio.entries)
     this.tiles.clear(true)
     this.chosenWord = ''
+    this.audiohinttext = ''
+    this.audiohintURL = ''
     this.previouswords = []
     this.completion = 0
     this.missedWords = 0
@@ -393,6 +410,9 @@ quitGame() {
 
     this.tiles.clear(true)
     this.chosenWord = ''
+    this.audiohinttext = ''
+    this.audiohintURL = ''
+
     this.previouswords = []
     this.completion = 0
     this.currentIndex = 0
@@ -535,8 +555,27 @@ completeString(input: string, length: number): string {
 chooseword() {
 
     while(this.previouswords.includes(this.chosenWord) || this.chosenWord == '') {
+        
         var chosen = this.dictionary[Phaser.Math.Between(0,this.dictionary.length-1)]
-        this.hint = chosen.examples[Phaser.Math.Between(0, chosen.examples.length-1)]
+        var hintindex = Phaser.Math.Between(0, chosen.examples.length-1)
+        this.hint = chosen.examples[hintindex]
+        if(chosen.exampleaudio.length != 0) {
+            this.audiohinttext = chosen.exampleaudio[hintindex]
+            this.audiohintURL = 'fx/' + this.audiohinttext + '.mp3'
+            if(!this.cache.audio.exists(this.audiohinttext)) {
+                var audioloader = this.load.audio(this.audiohinttext, this.audiohintURL)
+                audioloader.start()
+                audioloader.on('filecomplete-audio-'+this.audiohinttext, () => {
+                    this.hintaudio = this.sound.add(this.audiohinttext)
+                    this.hintPlayButton.visible = true
+                    //console.log('audio cache after new word', this.cache.audio.entries)
+            })
+        } else {
+            this.hintaudio = this.sound.add(this.audiohinttext)
+                    this.hintPlayButton.visible = true
+                    //console.log('audio cache after existing word', this.cache.audio.entries)
+        }
+        }
         this.chosenWord = chosen.value
         this.chosenletters = this.chosenWord.split('')
     }
@@ -560,6 +599,8 @@ nextWord(word:string) {
 
     this.previouswords.push(word)
     this.currentIndex = 0
+
+    this.hintPlayButton.visible = false
 
     this.initialtime = this.TIMELIMIT
     this.ticker = 0
