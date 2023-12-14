@@ -102,6 +102,8 @@ export default class WordScene extends Phaser.Scene {
         {value:"MÊME", examples:["je n'ai ____ pas peur, dit Taoki", "Lili et Hugo ont le ____ pull"],exampleaudio:['MEME_1','MEME_2']},
         {value:"OÙ", examples:["__ est mon camion ? demande Taoki", "On va __ pour les vacances ?"],exampleaudio:['OU_1','OU_2']},
         {value:"QUELLE", examples:["______ bonne idée !", "______ fête magnifique !"],exampleaudio:['QUELLE_1','QUELLE_2']},
+        {value:"ENTRE", examples:["Taoki marque _____ les poteaux", "Le livre est tombé _____ le lit et le bureau"],exampleaudio:['ENTRE_1','ENTRE_2']},
+        {value:"TOUTE", examples:["Hugo a joué avec Lili _____ la journée", "Taoki a fait la fête _____ la nuit !"],exampleaudio:['TOUTE_1','TOUTE_2']},
         
     ]
 
