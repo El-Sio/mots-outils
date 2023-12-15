@@ -1,0 +1,16 @@
+{
+    "short_name" :"mots outils",
+    "icons": [
+        {
+          "src": "assets/icon.png",
+          "type": "image/png",
+          "sizes": "512x512"
+        },
+        {
+            "src": "assets/icon_s.png",
+            "type": "image/png",
+            "sizes": "192x192"
+          }],
+    "display": "fullscreen",
+    "orientation":  "landscape"
+}

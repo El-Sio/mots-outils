@@ -375,7 +375,7 @@ resizeApp ()
 {
     // Width-height-ratio of game resolution
     // Replace 360 with your game width, and replace 640 with your game height
-    let game_ratio = 900 / 1600;
+    let game_ratio = 1600 / 900;
 	
     // Make div full height of browser and keep the ratio of game resolution
     let div = document.getElementById('app');
@@ -530,8 +530,52 @@ drawTiles(word:string, startX:number, startY:number) {
 
 completeString(input: string, length: number): string {
     const alphabet = 'ABCDEÉÈÊFGHIJKLMNOPQRSTUÙVWXYZ'; // Define the character pool
-    let result = input;
   
+    //add "close" letters to make things harder
+    if(input.split('').includes('N')) {
+        input += 'M'
+    }
+    else if(input.split('').includes('M')) {
+        input += 'N'
+    }
+
+    if(input.split('').includes('E')) {
+        input += 'A'
+    }
+    else if(input.split('').includes('A')) {
+        input += 'E'
+    }
+    
+    if(input.split('').includes('C')) {
+        input += 'S'
+    }
+    else if(input.split('').includes('S')) {
+        input += 'C'
+    }
+
+    if(input.split('').includes('É')) {
+        input += 'È'
+    }
+    else if(input.split('').includes('È')) {
+        input += 'É'
+    }
+
+    if(input.split('').includes('E')) {
+        input += 'Ê'
+    }
+    else if(input.split('').includes('Ê')) {
+        input += 'E'
+    }
+
+    if(input.split('').includes('L')) {
+        input += 'D'
+    }
+    else if(input.split('').includes('D')) {
+        input += 'L'
+    }
+
+    let result = input;
+
     if (length <= input.length) {
       return input.substr(0, length); // If the input length is already greater or equal to the desired length, return the input string
     }
@@ -582,7 +626,7 @@ chooseword() {
         this.chosenletters = this.chosenWord.split('')
     }
 
-    var letterdraw = this.completeString(this.chosenWord, 8)
+    var letterdraw = this.completeString(this.chosenWord, 10)
 
     var x  = this.canvas.width/2 - this.chosenWord.length*this.tileWidth/2 - (this.chosenWord.length-1)*this.spacer/2
     var y = this.canvas.height/2 + this.tileHeight

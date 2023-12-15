@@ -176,7 +176,7 @@ export default class UIScene extends Phaser.Scene
 {
     // Width-height-ratio of game resolution
     // Replace 360 with your game width, and replace 640 with your game height
-    let game_ratio = 900 / 1600;
+    let game_ratio = 1600 / 900;
 	
     // Make div full height of browser and keep the ratio of game resolution
     let div = document.getElementById('app');

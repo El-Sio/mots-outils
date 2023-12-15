@@ -24,13 +24,17 @@
 	}
 	</style>
 	<link rel="shortcut icon" type="image/png" href="favicon.ico"/>
+	<link rel="manifest" href="manifest.json">
 	<title>Le Jeu Des Mots Outils</title> 
 </head>
 
 <body>
 	<div id="app"></div>
 	<script type="module" src="src/main.ts"></script>
-	<script>document.getElementById("app").focus()</script>
+	<script>
+	document.getElementById("app").focus();
+	screen.orientation.lock('landscape');
+	</script>
 </body>
 
 </html>
