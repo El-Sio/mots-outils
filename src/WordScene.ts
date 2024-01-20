@@ -105,6 +105,12 @@ export default class WordScene extends Phaser.Scene {
         {value:"ENTRE", examples:["Taoki marque _____ les poteaux", "Le livre est tombé _____ le lit et le bureau"],exampleaudio:['ENTRE_1','ENTRE_2']},
         {value:"TOUTE", examples:["Hugo a joué avec Lili _____ la journée", "Taoki a fait la fête _____ la nuit !"],exampleaudio:['TOUTE_1','TOUTE_2']},
         {value:"ASSEZ", examples:["As tu _____ mangé ce midi ?", "Je n'ai pas _____ d'argent pour acheter ce jouet"],exampleaudio:['ASSEZ_1','ASSEZ_2']},
+        {value:"MON", examples:["C'est ___ vélo, dit Taoki", "___ père, il est tellement fort"],exampleaudio:['MON_1','MON_2']},
+        {value:"PRÈS", examples:["Ne va pas trop ____ du bord Taoki, dit lili", "La maison d'Hugo est ____ de l'école"],exampleaudio:['PRES_1','PRES_2']},
+        {value:"TOUS", examples:["Taoki a dévoré ____ les bonbons", "J'ai invité ____ mes amis à mon anniversaire"],exampleaudio:['TOUS_1','TOUS_2']},
+        {value:"TOUT À COUP", examples:["Hugo faisait la sieste quand ____ _ ____ le réveil a sonné", "____ _ ____ un dragon est sorti de la caverne"],exampleaudio:['TOUT_A_COUP_1','TOUT_A_COUP_2']},
+        {value:"MES", examples:["Je vais jouer avec ___ amis ce soir", "Ne touche pas à ___ affaires"],exampleaudio:['MES_1','MES_2']},
+        {value:"VOICI", examples:["_____ Taoki, c'est un dragon, dit Lili", "_____ l'homme le plus fort du monde"],exampleaudio:['VOICI_1','VOICI_2']},
         
     ]
 
