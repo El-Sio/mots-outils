@@ -126,6 +126,7 @@ preload() {
     this.load.spritesheet('buttons', 'img/buttons.png', {frameWidth:970, frameHeight:970})
 
     this.load.image('A', 'img/A.png')
+    this.load.image('À', 'img/Agrave.png')
     this.load.image('B', 'img/B.png')
     this.load.image('C', 'img/C.png')
     this.load.image('D', 'img/D.png')
@@ -536,7 +537,7 @@ drawTiles(word:string, startX:number, startY:number) {
 }
 
 completeString(input: string, length: number): string {
-    const alphabet = 'ABCDEÉÈÊFGHIJKLMNOPQRSTUÙVWXYZ'; // Define the character pool
+    const alphabet = 'ÀABCDEÉÈÊFGHIJKLMNOPQRSTUÙVWXYZ'; // Define the character pool
   
     //add "close" letters to make things harder
     if(input.split('').includes('N')) {
@@ -633,7 +634,7 @@ chooseword() {
         this.chosenletters = this.chosenWord.split('')
     }
 
-    var letterdraw = this.completeString(this.chosenWord, 10)
+    var letterdraw = this.completeString(this.chosenWord, 12)
 
     var x  = this.canvas.width/2 - this.chosenWord.length*this.tileWidth/2 - (this.chosenWord.length-1)*this.spacer/2
     var y = this.canvas.height/2 + this.tileHeight
